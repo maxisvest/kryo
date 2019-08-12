@@ -136,9 +136,13 @@ public class CompatibleFieldSerializer<T> extends FieldSerializer<T> {
 					String message = "Unable to read unknown data (unknown type). (" + getType().getName() + "#" + cachedField + ")";
 					if (!chunked) throw new KryoException(message, ex);
 					if (DEBUG) debug("kryo", message + " ,try to read remaining bytes", ex);
-                    registration = kryo.getRegistration(Object.class);
-//					inputChunked.nextChunk();
-//					continue;
+                    try {
+                        registration = kryo.getRegistration(Object.class);
+                    } catch (Exception e) {
+                        warn(e.getMessage());
+                        inputChunked.nextChunk();
+					    continue;
+                    }
 				}
 				if (registration == null) {
 					if (chunked) inputChunked.nextChunk();
